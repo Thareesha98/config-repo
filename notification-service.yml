@@ -21,17 +21,4 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
-spring:
-  cloud:
-    config:
-      uri: ${CONFIG_SERVER:http://localhost:8888}
-
-server:
-  port: ${PORT:8082}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,prometheus
 
