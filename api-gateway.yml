@@ -8,31 +8,51 @@ spring:
   cloud:
     gateway:
 
-      default-filters:
-        - TokenRelay
+      ##################################################
+      # 1) GLOBAL CORS (for your React frontend)
+      ##################################################
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"      # Vite dev URL
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
 
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-
+      ##################################################
+      # 2) ROUTES
+      ##################################################
       routes:
 
-        # ============================
-        #   NOTIFICATION-SERVICE
-        # ============================
+        # ----------------------------------------------
+        # 2.1 Notification microservice (REST)
+        # ----------------------------------------------
         - id: notification-service
           uri: lb://notification-service
           predicates:
             - Path=/api/notifications/**
           filters:
+            # /api/notifications/... stays, we only strip /api
             - StripPrefix=1
             - JwtUserFilter
 
-        # ============================
-        #   WebSocket Route
-        #   notification-ws-gateway
-        # ============================
+        # ----------------------------------------------
+        # 2.2 Monolith backend (temporary, for everything else)
+        # ----------------------------------------------
+        - id: campusTalk-monolith
+          uri: http://localhost:8082   # <-- CHANGE to your monolith port if different
+          predicates:
+            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+
+        # ----------------------------------------------
+        # 2.3 WebSocket notifications (WS Gateway)
+        # ----------------------------------------------
         - id: notification-ws-gateway
           uri: lb:ws://notification-ws-gateway
           predicates:
@@ -41,7 +61,7 @@ spring:
             - StripPrefix=0
 
 jwt:
-  secret: supersecretkey123456789
+  secret: "super-secret-key-change-me"
 
 
 eureka:
@@ -55,5 +75,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: "health,info,metrics,env"
 
