@@ -1,0 +1,79 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+
+      ##################################################
+      # 1) GLOBAL CORS (for your React frontend)
+      ##################################################
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"      # Vite dev URL
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      ##################################################
+      # 2) ROUTES
+      ##################################################
+      routes:
+
+        # ----------------------------------------------
+        # 2.1 Notification microservice (REST)
+        # ----------------------------------------------
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            # /api/notifications/... stays, we only strip /api
+            - StripPrefix=1
+            - JwtUserFilter
+
+        # ----------------------------------------------
+        # 2.2 Monolith backend (temporary, for everything else)
+        # ----------------------------------------------
+        - id: campusTalk-monolith
+          uri: http://localhost:8082   # <-- CHANGE to your monolith port if different
+          predicates:
+            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+
+        # ----------------------------------------------
+        # 2.3 WebSocket notifications (WS Gateway)
+        # ----------------------------------------------
+        - id: notification-ws-gateway
+          uri: lb:ws://notification-ws-gateway
+          predicates:
+            - Path=/ws/**
+          filters:
+            - StripPrefix=0
+
+jwt:
+  secret: "super-secret-key-change-me"
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env"
+
