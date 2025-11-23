@@ -7,17 +7,20 @@ spring:
 
   cloud:
     gateway:
-
-      default-filters:
-        - PreserveHostHeader
-
-      httpclient:
-        websocket:
-          max-frame-payload-length: 65536
-          max-frame-size: 65536
-
       server:
         webflux:
+
+          # 1️⃣ Keep Host header (required for WS handshake)
+          default-filters:
+            - PreserveHostHeader
+
+          # 2️⃣ WebSocket Support
+          httpclient:
+            websocket:
+              max-frame-payload-length: 65536
+              max-frame-size: 65536
+
+          # 3️⃣ CORS
           globalcors:
             cors-configurations:
               '[/**]':
@@ -32,27 +35,32 @@ spring:
                 allowed-headers: "*"
                 allow-credentials: true
 
-      routes:
+          # 4️⃣ ROUTES (NEW KEY!)
+          routes:
 
-        - id: notification-service
-          uri: lb://notification-service
-          predicates:
-            - Path=/api/notifications/**
-          filters:
-            - StripPrefix=1
-            - JwtUserFilter
+            # REST Notification Service
+            - id: notification-service
+              uri: lb://NOTIFICATION-SERVICE
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - StripPrefix=1
+                - JwtUserFilter
 
-        - id: campusTalk-monolith
-          uri: lb://CAMPUSTALK
-          predicates:
-            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+            # Main monolith backend
+            - id: campusTalk-monolith
+              uri: lb://CAMPUSTALK
+              predicates:
+                - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-        - id: notification-ws-gateway
-          uri: lb:ws://NOTIFICATION-WS-GATEWAY
-          predicates:
-            - Path=/ws/**
-          filters:
-            - JwtUserFilter
+            # Notification WebSocket Gateway (WS)
+            - id: notification-ws-gateway
+              uri: lb:ws://NOTIFICATION-WS-GATEWAY
+              predicates:
+                - Path=/ws
+              filters:
+                - JwtUserFilter
+
 
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
