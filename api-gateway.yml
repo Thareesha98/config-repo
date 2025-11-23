@@ -11,7 +11,7 @@ spring:
         webflux:
 
           ##################################################
-          # 1) GLOBAL CORS (for your React frontend)
+          # GLOBAL CORS
           ##################################################
           globalcors:
             cors-configurations:
@@ -28,32 +28,26 @@ spring:
                 allow-credentials: true
 
           ##################################################
-          # 2) ROUTES
+          # ROUTES
           ##################################################
           routes:
 
-            # ----------------------------------------------
-            # 2.1 Notification microservice (REST)
-            # ----------------------------------------------
+            # 1) Notification Microservice
             - id: notification-service
               uri: lb://notification-service
               predicates:
                 - Path=/api/notifications/**
               filters:
                 - StripPrefix=1
-                - JwtUserFilter
+                - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
 
-            # ----------------------------------------------
-            # 2.2 Monolith backend
-            # ----------------------------------------------
+            # 2) Monolith backend
             - id: campusTalk-monolith
               uri: http://localhost:8082
               predicates:
                 - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-            # ----------------------------------------------
-            # 2.3 WebSocket notifications (WS Gateway)
-            # ----------------------------------------------
+            # 3) WebSocket Gateway
             - id: notification-ws-gateway
               uri: lb:ws://notification-ws-gateway
               predicates:
