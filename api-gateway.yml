@@ -7,6 +7,18 @@ spring:
 
   cloud:
     gateway:
+
+      ##################################################
+      # REQUIRED FIX FOR WEBSOCKET HANDSHAKE
+      ##################################################
+      default-filters:
+        - PreserveHostHeader
+
+      httpclient:
+        websocket:
+          max-frame-payload-length: 65536
+          max-frame-size: 65536
+
       server:
         webflux:
           globalcors:
@@ -23,9 +35,12 @@ spring:
                 allowed-headers: "*"
                 allow-credentials: true
 
+      ##################################################
+      # ROUTES
+      ##################################################
       routes:
 
-        # 1) Notification REST API
+        # 1️⃣ Notification-Service (REST)
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
@@ -34,13 +49,13 @@ spring:
             - StripPrefix=1
             - JwtUserFilter
 
-        # 2) Monolith backend
+        # 2️⃣ Monolith backend (REST)
         - id: campusTalk-monolith
           uri: lb://CAMPUSTALK
           predicates:
             - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-        # 3) WebSocket Gateway
+        # 3️⃣ Notification WebSocket Gateway (WS)
         - id: notification-ws-gateway
           uri: lb:ws://NOTIFICATION-WS-GATEWAY
           predicates:
@@ -57,3 +72,9 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env"
