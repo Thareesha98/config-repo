@@ -52,8 +52,7 @@ spring:
               uri: lb:ws://notification-ws-gateway
               predicates:
                 - Path=/ws/**
-              filters:
-                - StripPrefix=1
+              
 
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
