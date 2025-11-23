@@ -3,78 +3,47 @@ server:
 
 spring:
   application:
-    name: API-GATEWAY
+    name: api-gateway
 
   cloud:
     gateway:
 
-      ##################################################
-      # REQUIRED FIX FOR WEBSOCKET HANDSHAKE
-      ##################################################
       default-filters:
-        - PreserveHostHeader
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
 
-      httpclient:
-        websocket:
-          max-frame-payload-length: 65536
-          max-frame-size: 65536
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "http://localhost:5173"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
 
-      server:
-        webflux:
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowed-origins:
-                  - "http://localhost:5173"
-                allowed-methods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                allowed-headers: "*"
-                allow-credentials: true
-
-      ##################################################
-      # ROUTES
-      ##################################################
       routes:
 
-        # 1️⃣ Notification-Service (REST)
+        # ============================
+        # 🔔 Notification REST API
+        # ============================
         - id: notification-service
-          uri: lb://NOTIFICATION-SERVICE
+          uri: lb://notification-service
           predicates:
             - Path=/api/notifications/**
           filters:
             - StripPrefix=1
             - JwtUserFilter
 
-        # 2️⃣ Monolith backend (REST)
-        - id: campusTalk-monolith
-          uri: lb://CAMPUSTALK
-          predicates:
-            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
-
-        # 3️⃣ Notification WebSocket Gateway (WS)
-        - id: notification-ws-gateway
-          uri: lb:ws://NOTIFICATION-WS-GATEWAY
+        # ============================
+        # 🔌 WebSocket Pass-through
+        # ============================
+        - id: notification-ws
+          uri: lb:ws://notification-ws-service
           predicates:
             - Path=/ws/**
           filters:
-            - JwtUserFilter
-
-jwt:
-  secret: supersecretkeyforjwtsigning123456789012345
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,metrics,env"
+            - StripPrefix=1   # IMPORTANT!
