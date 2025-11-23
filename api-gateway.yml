@@ -9,10 +9,6 @@ spring:
     gateway:
       server:
         webflux:
-
-          ##################################################
-          # GLOBAL CORS
-          ##################################################
           globalcors:
             cors-configurations:
               '[/**]':
@@ -27,32 +23,26 @@ spring:
                 allowed-headers: "*"
                 allow-credentials: true
 
-          ##################################################
-          # ROUTES
-          ##################################################
-          routes:
+      routes:
 
-            # 1) Notification Microservice
-            - id: notification-service
-              uri: lb://notification-service
-              predicates:
-                - Path=/api/notifications/**
-              filters:
-                - StripPrefix=1
-                - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+            - JwtUserFilter
 
-            # 2) Monolith backend
-            - id: campusTalk-monolith
-              uri: http://localhost:8081
-              predicates:
-                - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+        - id: campusTalk-monolith
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-            # 3) WebSocket Gateway
-            - id: notification-ws-gateway
-              uri: lb:ws://notification-ws-gateway
-              predicates:
-                - Path=/ws/**
-              
+        - id: notification-ws-gateway
+          uri: lb:ws://notification-ws-gateway
+          predicates:
+            - Path=/ws/**
+          filters: []   # IMPORTANT → no StripPrefix for WebSockets
 
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
@@ -69,4 +59,3 @@ management:
     web:
       exposure:
         include: "health,info,metrics,env"
-
