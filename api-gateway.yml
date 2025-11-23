@@ -38,7 +38,7 @@ spring:
               predicates:
                 - Path=/api/notifications/**
               filters:
-                - JwtUserFilterGatewayFilter   # MUST MATCH FILTER FACTORY NAME
+                - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
 
             # 2) Monolith backend
             - id: campusTalk-monolith
