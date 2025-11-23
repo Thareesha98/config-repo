@@ -9,6 +9,10 @@ spring:
     gateway:
       server:
         webflux:
+
+          ##################################################
+          # GLOBAL CORS
+          ##################################################
           globalcors:
             cors-configurations:
               '[/**]':
@@ -23,26 +27,34 @@ spring:
                 allowed-headers: "*"
                 allow-credentials: true
 
-      routes:
+          ##################################################
+          # ROUTES
+          ##################################################
+          routes:
 
-        - id: notification-service
-          uri: lb://notification-service
-          predicates:
-            - Path=/api/notifications/**
-          filters:
-            - StripPrefix=1
-            - JwtUserFilter
+            # 1) Notification Microservice
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - StripPrefix=1  #changed for test
+                - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
 
-        - id: campusTalk-monolith
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+            # 2) Monolith backend
+            - id: campusTalk-monolith
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-        - id: notification-ws-gateway
-          uri: lb:ws://notification-ws-gateway
-          predicates:
-            - Path=/ws/**
-          filters: []   # IMPORTANT → no StripPrefix for WebSockets
+            # 3) WebSocket Gateway
+            - id: notification-ws-gateway
+              uri: lb:ws://notification-ws-gateway
+              predicates:
+                - Path=/ws/**
+              filters:
+                - JwtUserFilter
+              
 
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
