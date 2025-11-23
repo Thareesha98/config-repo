@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: notification-ws-service
+    name: NOTIFICATION-WS-GATEWAY
 
 rabbitmq:
   host: localhost
