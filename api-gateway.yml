@@ -45,6 +45,7 @@ spring:
           predicates:
             - Path=/api/notifications/**
           filters:
+            - StripPrefix=1
             - JwtUserFilter
 
         # ---------------------------------------
