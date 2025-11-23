@@ -3,16 +3,12 @@ server:
 
 spring:
   application:
-    name: api-gateway
+    name: API-GATEWAY
 
   cloud:
     gateway:
       server:
         webflux:
-
-          ##################################################
-          # GLOBAL CORS
-          ##################################################
           globalcors:
             cors-configurations:
               '[/**]':
@@ -27,34 +23,30 @@ spring:
                 allowed-headers: "*"
                 allow-credentials: true
 
-          ##################################################
-          # ROUTES
-          ##################################################
-          routes:
+      routes:
 
-            # 1) Notification Microservice
-            - id: notification-service
-              uri: lb://notification-service
-              predicates:
-                - Path=/api/notifications/**
-              filters:
-                - StripPrefix=1  #changed for test
-                - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
+        # 1) Notification REST API
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+            - JwtUserFilter
 
-            # 2) Monolith backend
-            - id: campusTalk-monolith
-              uri: http://localhost:8081
-              predicates:
-                - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+        # 2) Monolith backend
+        - id: campusTalk-monolith
+          uri: lb://CAMPUSTALK
+          predicates:
+            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-            # 3) WebSocket Gateway
-            - id: notification-ws-gateway
-              uri: lb:ws://notification-ws-gateway
-              predicates:
-                - Path=/ws/**
-              filters:
-                - JwtUserFilter
-              
+        # 3) WebSocket Gateway
+        - id: notification-ws-gateway
+          uri: lb:ws://NOTIFICATION-WS-GATEWAY
+          predicates:
+            - Path=/ws/**
+          filters:
+            - JwtUserFilter
 
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
@@ -65,9 +57,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,metrics,env"
