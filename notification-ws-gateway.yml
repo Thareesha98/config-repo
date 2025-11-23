@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: NOTIFICATION-WS-GATEWAY
+    name: notification-ws-gateway
 
   main:
     web-application-type: reactive   # 👉 REQUIRED for WebFlux WS support
