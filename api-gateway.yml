@@ -42,7 +42,7 @@ spring:
 
             # 2) Monolith backend
             - id: campusTalk-monolith
-              uri: http://localhost:8082
+              uri: http://localhost:8081
               predicates:
                 - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
