@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: notification-ws-gateway
+    name: NOTIFICATION-WS-GATEWAY
 
   main:
-    web-application-type: reactive   # 👉 REQUIRED for WebFlux WS support
+    web-application-type: reactive  # REQUIRED for Reactor Netty WebFlux
 
   rabbitmq:
     host: localhost
