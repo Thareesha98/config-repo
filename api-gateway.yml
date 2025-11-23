@@ -56,7 +56,7 @@ spring:
                 - StripPrefix=0
 
 jwt:
-  secret: "super-secret-key-change-me"
+  secret: supersecretkeyforjwtsigning123456789012345
 
 eureka:
   client:
