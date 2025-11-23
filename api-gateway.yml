@@ -48,7 +48,7 @@ spring:
             - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
         - id: notification-ws-gateway
-          uri: lb:ws://notification-ws-gateway
+          uri: lb:ws://NOTIFICATION-WS-GATEWAY
           predicates:
             - Path=/ws/**
           filters:
