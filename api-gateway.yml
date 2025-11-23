@@ -38,7 +38,6 @@ spring:
               predicates:
                 - Path=/api/notifications/**
               filters:
-                - StripPrefix=1
                 - JwtUserFilter   # MUST MATCH FILTER FACTORY NAME
 
             # 2) Monolith backend
