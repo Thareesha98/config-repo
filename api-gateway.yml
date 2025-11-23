@@ -7,67 +7,76 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webflux:
 
-          # 1️⃣ Keep Host header (required for WS handshake)
-          default-filters:
-            - PreserveHostHeader
+      # 1️⃣ ENABLE WebSocket Proxying
+      httpclient:
+        websocket:
+          max-frame-payload-length: 65536
+          max-frame-size: 65536
 
-          # 2️⃣ WebSocket Support
-          httpclient:
-            websocket:
-              max-frame-payload-length: 65536
-              max-frame-size: 65536
+      # 2️⃣ KEEP HOST HEADER (CRITICAL FOR WS HANDSHAKE)
+      default-filters:
+        - PreserveHostHeader
 
-          # 3️⃣ CORS
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowed-origins:
-                  - "http://localhost:5173"
-                allowed-methods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                allowed-headers: "*"
-                allow-credentials: true
+      # 3️⃣ CORS (REST + WEBSOCKET)
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "http://localhost:5173"   # React
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
 
-          # 4️⃣ ROUTES (NEW KEY!)
-          routes:
+      # 4️⃣ ROUTES
+      routes:
 
-            # REST Notification Service
-            - id: notification-service
-              uri: lb://NOTIFICATION-SERVICE
-              predicates:
-                - Path=/api/notifications/**
-              filters:
-                - StripPrefix=1
-                - JwtUserFilter
+        # ---------------------------------------
+        # REST → NOTIFICATION-SERVICE
+        # ---------------------------------------
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+            - JwtUserFilter
 
-            # Main monolith backend
-            - id: campusTalk-monolith
-              uri: lb://CAMPUSTALK
-              predicates:
-                - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
+        # ---------------------------------------
+        # REST → Monolithic main backend
+        # ---------------------------------------
+        - id: campusTalk-monolith
+          uri: lb://CAMPUSTALK
+          predicates:
+            - Path=/api/**, /auth/**, /clubs/**, /events/**, /posts/**
 
-            # Notification WebSocket Gateway (WS)
-            - id: notification-ws-gateway
-              uri: lb:ws://NOTIFICATION-WS-GATEWAY
-              predicates:
-                - Path=/ws
-              filters:
-                - JwtUserFilter
+        # ---------------------------------------
+        # WEBSOCKET → NOTIFICATION-WS-GATEWAY
+        # ---------------------------------------
+        - id: notification-ws-gateway
+          uri: lb:ws://NOTIFICATION-WS-GATEWAY
+          predicates:
+            - Path=/ws/**
+          filters:
+            - JwtUserFilter
 
 
+# JWT Secret
 jwt:
   secret: supersecretkeyforjwtsigning123456789012345
 
+# Eureka Discovery
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+  instance:
+    prefer-ip-address: true
