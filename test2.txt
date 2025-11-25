@@ -104,6 +104,20 @@ namespace RacingHubCarRental
 
 
 
+ public ManufacturerModel GetManufacturerModelByID(int id)
+        {
+            ValidateId(id);
+            return DB.ManufacturerModels.Find(id);
+        }
+
+ public ManufacturerModel GetManufacturerModelByID(int id)
+        {
+            ValidateId(id);
+            return DB.ManufacturerModels.Find(id);
+        }
+
+
+
 
 
 
