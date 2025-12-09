@@ -82,11 +82,32 @@ namespace RacingHubCarRental
             token);
         }
 
-        public ManufacturerModel GetManufacturerModelByID(int id)
+
+
+
+ public ManufacturerModel GetManufacturerModelByID(int id)
         {
             ValidateId(id);
             return DB.ManufacturerModels.Find(id);
         }
+
+ public ManufacturerModel GetManufacturerModelByID(int id)
+        {
+            ValidateId(id);
+            return DB.ManufacturerModels.Find(id);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         public async Task<ManufacturerModel?> GetManufacturerModelByIdAsync(int id, CancellationToken token = default)
         {
