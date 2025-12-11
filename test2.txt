@@ -15,11 +15,11 @@ namespace RacingHubCarRental
     {
         // =====================================================================
         // VALIDATION HELPERS
-        // =====================================================================
+        // =================================================================
 
         private void ValidateModel(ManufacturerModel model)
         {
-            if (model == null)
+            if (model1 == null)
                 throw new ArgumentNullException(nameof(model), "ManufacturerModel cannot be null.");
         }
 
