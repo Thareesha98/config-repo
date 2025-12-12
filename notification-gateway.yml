@@ -8,7 +8,7 @@ spring:
 rabbitmq:
   host: localhost
   port: 5672s
-  autoupdate: true
+  autoupdate: false
   username: guest
   password: guest
 
