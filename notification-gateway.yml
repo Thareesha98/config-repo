@@ -6,8 +6,8 @@ spring:
     name: NOTIFICATION-GATEWAY
 
 rabbitmq:
-  host: localhost
-  port: 5672s
+  host: RABBITMQHOST
+  port: 5672
   autoupdate: true
   username: guest
   password: guest
