@@ -3,21 +3,38 @@ server:
 
 spring:
   application:
-    name: NOTIFICATION-GATEWAY
+    # Changed name to reflect standard API Gateway role
+    name: API-GATEWAY 
+  cloud:
+    gateway:
+      routes:
+        # Route to the actual Notification Service
+        - id: notification_route
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+        # Example route for a User Service
+        - id: user_service_route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
 
+# RabbitMQ configuration, parameterized for host
 rabbitmq:
-  host: RABBITMQHOST
+  host: ${RABBITMQ_HOST:localhost} 
   port: 5672
   autoupdate: true
   username: guest
   password: guest
 
+# Eureka configuration
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
-    fetch-registry: false
+    # Set to true so the gateway knows where other services are
+    fetch-registry: true 
   instance:
     prefer-ip-address: true
-
+    hostname: ${spring.application.name}
