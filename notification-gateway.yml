@@ -28,13 +28,14 @@ rabbitmq:
   password: guest
 
 # Eureka configuration
+# application.yml
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
-    # Set to true so the gateway knows where other services are
-    fetch-registry: true 
+    fetch-registry: true
   instance:
     prefer-ip-address: true
-    hostname: ${spring.application.name}
+    # Recommended Change: Use a descriptive variable for host resolution
+    hostname: ${API_GATEWAY_INSTANCE_HOST:localhost}
