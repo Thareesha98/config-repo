@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8081
 
 spring:
   application:
@@ -37,5 +37,10 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
+<<<<<<< HEAD
     # Recommended Change: Use a descriptive variable for host resolution
     hostname: ${API_GATEWAY_INSTANCE_HOST:localhost}
+=======
+    hostname: ${spring.application.name}
+
+>>>>>>> 17d1effbbc8abed98ce666b51cf4f1379f41204f
