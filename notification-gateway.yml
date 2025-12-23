@@ -12,7 +12,7 @@ spring:
         - id: notification_route
           uri: lb://NOTIFICATION-SERVICE
           predicates:
-            - Path=/api/notifications/**
+            - Path=/notifications/**
         # Example route for a User Service
         - id: user_service_route
           uri: lb://USER-SERVICE
