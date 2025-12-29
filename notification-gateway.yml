@@ -19,7 +19,7 @@ spring:
           predicates:
             - Path=/api/users/**
 
-# RabbitMQ configuration, parameterized for host
+
 rabbitmq:
   host: ${RABBITMQ_HOST:localhost} 
   port: 5672
