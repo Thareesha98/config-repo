@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    # Changed name to reflect standard API Gateway role
+
     name: API-GATEWAY 
   cloud:
     gateway:
