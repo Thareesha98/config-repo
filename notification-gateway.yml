@@ -8,7 +8,7 @@ spring:
   cloud:
     gateway:
       routes:
-        # Route to the actual Notification Service
+
         - id: notification_route
           uri: lb://NOTIFICATION-SERVICE
           predicates:
